@@ -5,7 +5,6 @@ from six.moves import urllib
 import traceback
 from lxml import etree
 
-
 class Client(object):
     API_URL = '%s://airbrake.io/notifier_api/v2/notices'
     ERRORS = {
@@ -18,6 +17,8 @@ class Client(object):
         'TIMEOUT': 5,
         'USE_SSL': True,
     }
+
+    filters = []
 
     @property
     def url(self):
@@ -41,7 +42,13 @@ class Client(object):
         self._settings.update(getattr(settings, 'AIRBRAKE', {}))
         return self._settings
 
+    @staticmethod
+    def addFilter(filter):
+        Client.filters.append(filter);
+
     def notify(self, exception=None, request=None):
+        if not reduce((lambda valid, func: valid and func(exception)), Client.filters, True):
+            return False
         headers = {
             'Content-Type': 'text/xml'
         }
