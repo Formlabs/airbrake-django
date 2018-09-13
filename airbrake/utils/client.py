@@ -5,6 +5,9 @@ from six.moves import urllib
 import traceback
 from lxml import etree
 
+if sys.version_info > (2, 7):
+    from functools import reduce
+
 class Client(object):
     API_URL = '%s://airbrake.io/notifier_api/v2/notices'
     ERRORS = {
